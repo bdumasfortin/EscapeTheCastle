@@ -14,6 +14,14 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float _zoomSensitivity = 200f;
     [SerializeField] private float _zoomDampening = 10f;
 
+    [Header("Camera move speed")]
+    [SerializeField] private float _horizontalSpeed = 200f;
+    [SerializeField] private float _verticalSpeed = 200f;
+
+    [Header("Camera reset")]
+    [SerializeField] private float _rotationDampening = 10f;
+    [SerializeField] private bool _resetOnlyWhileMoving = true;
+
     [Header("Camera collision")]
     [SerializeField] private float _minDistanceFromWall = 0.5f;
     [SerializeField] private LayerMask _collisionLayers = -1;
@@ -38,6 +46,21 @@ public class CameraController : MonoBehaviour
 
     void LateUpdate()
     {
+        if (GUIUtility.hotControl == 0) // GUI isn't focused
+        {
+            if (HoldingDownCameraButton())
+            {
+                _eulerAngles.x += Input.GetAxis("Mouse X") * _horizontalSpeed * 0.02f;
+                _eulerAngles.y -= Input.GetAxis("Mouse Y") * _verticalSpeed * 0.02f;
+            }
+            else if (!_resetOnlyWhileMoving || HoldingDownMovementInput())
+            {
+                float targetRotationAngle = _targetTransform.eulerAngles.y;
+                float currentRotationAngle = transform.eulerAngles.y;
+                _eulerAngles.x = Mathf.LerpAngle(currentRotationAngle, targetRotationAngle, _rotationDampening * Time.deltaTime);
+            }
+        }
+
         _desiredDistance -= Input.GetAxis("Mouse ScrollWheel") * Time.deltaTime * Mathf.Abs(_desiredDistance) * _zoomSensitivity;
         _desiredDistance = Mathf.Clamp(_desiredDistance, _minCameraDistance, _maxCameraDistance);
 
@@ -66,6 +89,16 @@ public class CameraController : MonoBehaviour
 
         transform.rotation = rotation;
         transform.position = position;
+    }
+
+    private bool HoldingDownCameraButton()
+    {
+        return Input.GetButton(InputUtils.BUTTON_HOLD_CAMERA) || Input.GetButton(InputUtils.BUTTON_HOLD_CAMERA2);
+    }
+
+    private bool HoldingDownMovementInput()
+    {
+        return Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0;
     }
 
     private static float ClampAngle(float angle, float min, float max)

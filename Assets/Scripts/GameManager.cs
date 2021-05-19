@@ -2,12 +2,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] DoubleDoor _openOnPressE;
-
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E) && _openOnPressE != null)
-            _openOnPressE.Toggle();
+        if (Input.GetMouseButtonDown(0))
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit, 100))
+                hit.collider.GetComponent<Interactable>()?.Interact();
     }
 
     public void ExitGame()

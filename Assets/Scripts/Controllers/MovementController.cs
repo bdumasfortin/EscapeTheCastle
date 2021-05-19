@@ -21,8 +21,23 @@ public class MovementController : MonoBehaviour
 
         var moveDirection = GetMovementRelativeToPlayer();
 
+        HandleAnimations();
+
         if (_entity.IsGrounded)
             _entity.SetVelocity(CalculateNewVelocity(moveDirection));
+    }
+
+    //TODO: Move this out of movement controller
+    private void HandleAnimations()
+    {
+        var verInput = Input.GetAxisRaw("Vertical");
+
+        if (verInput < 0)
+            GetComponent<Animator>()?.SetInteger("State", 2);
+        else if (verInput > 0)
+            GetComponent<Animator>()?.SetInteger("State", 1);
+        else
+            GetComponent<Animator>()?.SetInteger("State", 0);
     }
 
     private float GetCurrentMoveSpeed()

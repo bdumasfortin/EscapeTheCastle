@@ -1,36 +1,31 @@
 using UnityEngine;
 
-public class DoubleDoor : MonoBehaviour, IOpenable
+public class DoubleDoor : Door
 {
     [SerializeField] Transform _leftDoor;
     [SerializeField] Transform _rightDoor;
 
-    public bool IsOpen => _isOpen;
-    bool _isOpen = false;
-
-    public void Open()
+    public override void Open()
     {
         if (_isOpen) return;
-
-        _isOpen = true;
-        Apply();
+        base.Open();
+        RotateDoorsTransform();
     }
 
-    public void Close()
+    public override void Close()
     {
         if (!_isOpen) return;
-
-        _isOpen = false;
-        Apply();
+        base.Close();
+        RotateDoorsTransform();
     }
 
-    public void Toggle()
+    public override void Toggle()
     {
-        _isOpen = !_isOpen;
-        Apply();
+        base.Toggle();
+        RotateDoorsTransform();
     }
 
-    void Apply()
+    void RotateDoorsTransform()
     {
         _leftDoor.Rotate(Vector3.up * 90 * (_isOpen ? 1 : -1));
         _rightDoor.Rotate(Vector3.up * 90 * (_isOpen ? -1 : 1));
